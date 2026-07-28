@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentiment Analysis Demo</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Arial, sans-serif;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: #f8fafc;
+      }
+      .card {
+        width: min(92vw, 720px);
+        padding: 2rem;
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.9);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      }
+      h1 { margin-top: 0; }
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 1rem;
+        border-radius: 10px;
+        border: 1px solid #475569;
+        font-size: 1rem;
+        resize: vertical;
+        box-sizing: border-box;
+      }
+      button {
+        margin-top: 1rem;
+        padding: 0.8rem 1.2rem;
+        border: none;
+        border-radius: 10px;
+        background: #38bdf8;
+        color: #082f49;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      button:hover { background: #7dd3fc; }
+      .result {
+        margin-top: 1.2rem;
+        padding: 1rem;
+        border-radius: 10px;
+        background: #111827;
+        border: 1px solid #334155;
+      }
+      .tag {
+        display: inline-block;
+        padding: 0.3rem 0.7rem;
+        border-radius: 999px;
+        font-weight: 700;
+        margin-top: 0.5rem;
+      }
+      .positive { background: #16a34a; color: white; }
+      .negative { background: #dc2626; color: white; }
+      .neutral { background: #d97706; color: white; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Sentiment Analysis</h1>
+      <p>Enter a sentence and the trained model will classify it as Negative, Neutral, or Positive.</p>
+      <textarea id="sentence" placeholder="Type a sentence here..."></textarea>
+      <button id="predictBtn">Analyze Sentiment</button>
+      <div id="result" class="result">No prediction yet.</div>
+    </div>
+
+    <script>
+      const resultBox = document.getElementById('result');
+      document.getElementById('predictBtn').addEventListener('click', async () => {
+        const text = document.getElementById('sentence').value.trim();
+        if (!text) {
+          resultBox.innerHTML = '<strong>Please enter a sentence.</strong>';
+          return;
+        }
+
+        resultBox.innerHTML = 'Analyzing...';
+
+        try {
+          const response = await fetch('/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text })
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Prediction failed');
+          }
+
+          const sentiment = data.sentiment;
+          const badgeClass = sentiment.toLowerCase();
+          resultBox.innerHTML = `
+            <strong>Input:</strong> ${data.text}<br>
+            <strong>Prediction:</strong>
+            <span class="tag ${badgeClass}">${sentiment}</span>
+          `;
+        } catch (error) {
+          resultBox.innerHTML = `<strong>Error:</strong> ${error.message}`;
+        }
+      });
+    </script>
+  </body>
+</html>
