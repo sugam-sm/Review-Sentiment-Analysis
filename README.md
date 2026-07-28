@@ -1,4 +1,4 @@
-# Sentiment Analysis Demo
+# Review Sentiment Analysis
 
 This project contains a simple web page that uses a saved scikit-learn sentiment model to classify user-entered text as Negative, Neutral, or Positive.
 
