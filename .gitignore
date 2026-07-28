@@ -1,6 +1,9 @@
 # virtual enviroment
 .venv/
 
+# Datasets
+Datasets/
+
 # Python cache
 __pycache__/
 *.py[cod]
